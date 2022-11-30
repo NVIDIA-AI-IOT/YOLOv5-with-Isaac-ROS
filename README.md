@@ -137,4 +137,4 @@ Parameters like the confidence threshold can be specified in the params file `de
 - max_det: Maximum number of detections per image
 
 ## Support
-Please reach out regarding issues and suggestions here.
+Please reach out regarding issues and suggestions [here](https://github.com/NVIDIA-AI-IOT/YOLOv5-with-Isaac-ROS/issues).
