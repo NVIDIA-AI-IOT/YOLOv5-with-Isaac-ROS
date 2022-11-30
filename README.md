@@ -62,7 +62,7 @@ pip install -v .
          +- requirements.txt
          +- yolov5s.onnx
          +- isaac_ros_common
-         +- yolov5-isaac-ros-dnn
+         +- YOLOv5-with-Isaac-ROS
             +- README
             +- launch
             +- images
@@ -116,7 +116,7 @@ cd /usr/src/tensorrt/bin
    +- isaac_ros-dev
       +- src
          +- isaac_ros_common
-         +- yolov5-isaac-ros-dnn
+         +- YOLOv5-with-Isaac-ROS
             +- README
             +- launch
             +- yolov5
