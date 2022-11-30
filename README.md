@@ -22,7 +22,7 @@ Refer to the license terms for the YOLOv5 project before using this software and
 ### Model preparation
 - Download the YOLOv5 PyTorch model - [yolov5s.pt](https://github.com/ultralytics/yolov5/releases/download/v6.2/yolov5s.pt) from the [Ultralytics YOLOv5](https://github.com/ultralytics/yolov5) project.
 - Export to ONNX following steps [here](https://github.com/ultralytics/yolov5/issues/251) and visualize the ONNX model using [Netron](https://netron.app/). Note `input` and `output` names - these will be used to run the node. For instance, `images` for input and `output0` for output.
-- Copy the ONNX model to a location accessible from the container.
+
 
 ### Object Detection pipeline Setup
 - Following the development environment setup above, you should have a ROS2 workspace named `workspaces/isaac_ros-dev`. Clone this repository and its dependencies under `workspaces/isaac_ros-dev/src`:
@@ -35,6 +35,7 @@ git clone https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_image_pipeline
 git clone https://github.com/NVIDIA-AI-IOT/YOLOv5-with-Isaac-ROS.git
 ```
 - Download [requirements.txt](https://github.com/ultralytics/yolov5/blob/master/requirements.txt) from the Ultralytics YOLOv5 project to `workspaces/isaac_ros-dev/src`.
+- Copy your ONNX model (say, `yolov5s.onnx`) from above to `workspaces/isaac_ros-dev/src`.
 - Launch the Docker container using the run_dev.sh script:
 ```
 cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common
@@ -52,7 +53,7 @@ git checkout $torchvision_tag
 pip install -v .
 ```
 - Download the [utils](https://github.com/ultralytics/yolov5/tree/master/utils) folder from the Ultralytics YOLOv5 project and put it in the `yolov5_isaac_ros` folder of this repository.
-- Finally, your file structure should look like this (not showing all files here):
+- Finally, your file structure should look like this (all files not shown here):
 ```
 .
 +- workspaces
@@ -98,28 +99,32 @@ ros2 launch yolov5_isaac_ros isaac_ros_yolov5_tensor_rt.launch.py network_image_
 ```
 
 ## Using Triton
-<figure>
-   <img src="/images/triton_workflow.PNG" height="75%" width="75%">
-   <figcaption>Workflow</figcaption>
-</figure>
 
-- Convert the ONNX model to a TRT plan file (named `model.plan`) using `trtexec`. To do this, run the following command from `/usr/src/tensorrt/bin` and save the generated file under `yolov5/1/`. 
+<p align="center" width="100%">
+<img src="images/triton_workflow.PNG"  height="75%" width="75%">
+</p>
+
+- Convert the ONNX model (say, `yolov5s.onnx`) to a TensorRT plan file named `model.plan` using `trtexec`. To do this, run the following command from `/usr/src/tensorrt/bin` and save the generated file under `yolov5/1/`. 
 ```
+cd /usr/src/tensorrt/bin
 ./trtexec --onnx=yolov5s.onnx --saveEngine=model.plan  --fp16
 ```
-- File structure should look like this:
+- File structure should look like this (all files not shown here):
 ```
 .
-+- yolov5_isaac_ros
-   +- config
-   +- yolov5
-      +- config.pbtxt
-      +- 1
-         +- model.plan
-   +- launch
-      +- isaac_ros_yolov5_triton.launch.py
-      
++- workspaces
+   +- isaac_ros-dev
+      +- src
+         +- isaac_ros_common
+         +- yolov5-isaac-ros-dnn
+            +- README
+            +- launch
+            +- yolov5
+               +- config.pbtxt
+               +- 1
+                  +- model.plan
 ```
+
 - To launch the pipeline using Triton for inference: 
 ```
 ros2 launch yolov5_isaac_ros isaac_ros_yolov5_triton.launch.py network_image_width:=640 network_image_height:=640
