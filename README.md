@@ -31,6 +31,7 @@ cd ~/workspaces/isaac_ros-dev/src
 git clone https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_common.git
 git clone https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_nitros.git
 git clone https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_dnn_inference.git
+git clone https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_image_pipeline
 git clone https://github.com/NVIDIA-AI-IOT/YOLOv5-with-Isaac-ROS.git
 ```
 - Download [requirements.txt](https://github.com/ultralytics/yolov5/blob/master/requirements.txt) from the Ultralytics YOLOv5 project to `workspaces/isaac_ros-dev/src`.
@@ -71,26 +72,23 @@ pip install -v .
 ```
 Refer to the license terms for the YOLOv5 project before using this software and ensure you are using YOLOv5 under license terms compatible with your project requirements.
 
-### Launching RealSense camera for input
-- Follow [Isaac ROS Realsense Setup](https://github.com/NVIDIA-ISAAC-ROS/.github/blob/main/profile/realsense-setup.md) to setup the camera.
-- Follow steps [here](https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_image_pipeline#quickstart) to launch the camera node (skip step 6).
-- Verify that images are being published on `/camera/color/image_raw`. You could use RQt for this or use this command in another terminal inside the container:
-```
-ros2 topic echo /camera/color/image_raw
-```
-
 <p align="center" width="100%">
 <img src="images/workflow_with_camera.PNG"  height="75%" width="75%">
 </p>
 
 ### Running the pipeline
+- Follow [Isaac ROS Realsense Setup](https://github.com/NVIDIA-ISAAC-ROS/.github/blob/main/profile/realsense-setup.md) to setup the camera.
 - Inside the container, build and source the workspace:
 ```
 cd /workspaces/isaac_ros-dev
 colcon build --symlink-install
 source install/setup.bash
 ```
-- Run the `yolov5_isaac_ros` node. This subscribes to input images from the RealSense camera on topic `/camera/color/image_raw`. It performs inference and publishes results on topic `/object_detections` as [Detection2DArray](http://docs.ros.org/en/lunar/api/vision_msgs/html/msg/Detection2DArray.html) messages. Use the names noted above in `Model preparation` as `input_binding_names` and `output_binding_names` (for example, `images` for input and `output0` for output). Similarly, use the input dimensions noted above as `network_image_width` and `network_image_height`:
+- Launch the RealSense camera node (confirm you've completed all the steps [here](https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_image_pipeline#quickstart)):
+`ros2 launch realsense2_camera rs_launch.py`
+- Verify that images are being published on `/camera/color/image_raw`. You could use RQt for this or use this command in another terminal inside the container:
+`ros2 topic echo /camera/color/image_raw`
+- In another terminal inside the container, run the `yolov5_isaac_ros` node. This subscribes to input images from the RealSense camera on topic `/camera/color/image_raw`. It performs inference and publishes results on topic `/object_detections` as [Detection2DArray](http://docs.ros.org/en/lunar/api/vision_msgs/html/msg/Detection2DArray.html) messages. Use the names noted above in `Model preparation` as `input_binding_names` and `output_binding_names` (for example, `images` for input and `output0` for output). Similarly, use the input dimensions noted above as `network_image_width` and `network_image_height`:
 ```
 ros2 launch yolov5_isaac_ros isaac_ros_yolov5_tensor_rt.launch.py model_file_path:=/workspaces/isaac_ros-dev/src/yolov5s.onnx engine_file_path:=/workspaces/isaac_ros-dev/src/yolov5s.plan input_binding_names:=['images'] output_binding_names:=['output0'] network_image_width:=640 network_image_height:=640
 ```
