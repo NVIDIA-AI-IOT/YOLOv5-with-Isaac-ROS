@@ -31,7 +31,7 @@ cd ~/workspaces/isaac_ros-dev/src
 git clone https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_common.git
 git clone https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_nitros.git
 git clone https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_dnn_inference.git
-git clone 
+git clone https://github.com/NVIDIA-AI-IOT/YOLOv5-with-Isaac-ROS.git
 ```
 - Download [requirements.txt](https://github.com/ultralytics/yolov5/blob/master/requirements.txt) from the Ultralytics YOLOv5 project to `workspaces/isaac_ros-dev/src`.
 - Launch the Docker container using the run_dev.sh script:
