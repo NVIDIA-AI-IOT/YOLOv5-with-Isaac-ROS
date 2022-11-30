@@ -3,7 +3,7 @@
 This is a sample showing how to integrate YOLOv5 with Nvidia [Isaac ROS DNN Inference](https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_dnn_inference).
 
 <p align="center" width="100%">
-<img src="images/workflow_with_camera.PNG"  height="75%" width="75%">
+<img src="images/output.png"  height="75%" width="75%">
 </p>
 
 ## Requirements
@@ -78,6 +78,10 @@ Refer to the license terms for the YOLOv5 project before using this software and
 ```
 ros2 topic echo /camera/color/image_raw
 ```
+
+<p align="center" width="100%">
+<img src="images/workflow_with_camera.PNG"  height="75%" width="75%">
+</p>
 
 ### Running the pipeline
 - Inside the container, build and source the workspace:
