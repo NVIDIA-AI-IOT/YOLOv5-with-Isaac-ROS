@@ -73,6 +73,9 @@ pip install -v .
 ```
 Refer to the license terms for the YOLOv5 project before using this software and ensure you are using YOLOv5 under license terms compatible with your project requirements.
 
+- Make the following changes to `utils/general.py`, `utils/torch_utils.py` and `utils/metrics.py` after downloading utils from the Ultralytics YOLOv5 project:
+   - In the import statements, add `yolov5_isaac_ros` before `utils`. For instance - change 'from utils.metrics import box_iou' to 'from yolov5_isaac_ros.utils.metrics import box_iou'
+
 <p align="center" width="100%">
 <img src="images/workflow_with_camera.PNG"  height="75%" width="75%">
 </p>
