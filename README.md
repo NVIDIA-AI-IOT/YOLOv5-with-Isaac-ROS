@@ -21,7 +21,7 @@ Refer to the license terms for the YOLOv5 project before using this software and
 
 ### Model preparation
 - Download the YOLOv5 PyTorch model - [yolov5s.pt](https://github.com/ultralytics/yolov5/releases/download/v6.2/yolov5s.pt) from the [Ultralytics YOLOv5](https://github.com/ultralytics/yolov5) project.
-- Export to ONNX following steps [here](https://github.com/ultralytics/yolov5/issues/251) and visualize the ONNX model using [Netron](https://netron.app/). Note `input` and `output` names - these will be used to run the node. For instance, `images` for input and `output0` for output.
+- Export to ONNX following steps [here](https://github.com/ultralytics/yolov5/issues/251) and visualize the ONNX model using [Netron](https://netron.app/). Note `input` and `output` names - these will be used to run the node. For instance, `images` for input and `output0` for output. Also note input dimensions, for instance, (1x3x640x640).
 
 
 ### Object Detection pipeline Setup
@@ -36,6 +36,7 @@ git clone https://github.com/NVIDIA-AI-IOT/YOLOv5-with-Isaac-ROS.git
 ```
 - Download [requirements.txt](https://github.com/ultralytics/yolov5/blob/master/requirements.txt) from the Ultralytics YOLOv5 project to `workspaces/isaac_ros-dev/src`.
 - Copy your ONNX model (say, `yolov5s.onnx`) from above to `workspaces/isaac_ros-dev/src`.
+- Follow [Isaac ROS Realsense Setup](https://github.com/NVIDIA-ISAAC-ROS/.github/blob/main/profile/realsense-setup.md) to setup the camera.
 - Launch the Docker container using the run_dev.sh script:
 ```
 cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common
@@ -74,32 +75,39 @@ pip install -v .
 Refer to the license terms for the YOLOv5 project before using this software and ensure you are using YOLOv5 under license terms compatible with your project requirements.
 
 - Make the following changes to `utils/general.py`, `utils/torch_utils.py` and `utils/metrics.py` after downloading utils from the Ultralytics YOLOv5 project:
-   - In the import statements, add `yolov5_isaac_ros` before `utils`. For instance - change 'from utils.metrics import box_iou' to 'from yolov5_isaac_ros.utils.metrics import box_iou'
+   - In the import statements, add `yolov5_isaac_ros` before `utils`. For instance - change `from utils.metrics import box_iou` to `from yolov5_isaac_ros.utils.metrics import box_iou`
 
 <p align="center" width="100%">
 <img src="images/workflow_with_camera.PNG"  height="75%" width="75%">
 </p>
 
 ### Running the pipeline
-- Follow [Isaac ROS Realsense Setup](https://github.com/NVIDIA-ISAAC-ROS/.github/blob/main/profile/realsense-setup.md) to setup the camera.
 - Inside the container, build and source the workspace:
 ```
 cd /workspaces/isaac_ros-dev
 colcon build --symlink-install
 source install/setup.bash
 ```
-- Launch the RealSense camera node (confirm you've completed all the steps [here](https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_image_pipeline#quickstart)):
+- Launch the RealSense camera node as per step 7 [here](https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_image_pipeline#quickstart):
 `ros2 launch realsense2_camera rs_launch.py`
-- Verify that images are being published on `/camera/color/image_raw`. You could use RQt for this or use this command in another terminal inside the container:
+- Verify that images are being published on `/camera/color/image_raw`. You could use [RQt](https://docs.ros.org/en/humble/Concepts/About-RQt.html)/[Foxglove](https://foxglove.dev/) for this or use this command in another terminal inside the container:
 `ros2 topic echo /camera/color/image_raw`
-- In another terminal inside the container, run the `yolov5_isaac_ros` node. This subscribes to input images from the RealSense camera on topic `/camera/color/image_raw`. It performs inference and publishes results on topic `/object_detections` as [Detection2DArray](http://docs.ros.org/en/lunar/api/vision_msgs/html/msg/Detection2DArray.html) messages. Use the names noted above in `Model preparation` as `input_binding_names` and `output_binding_names` (for example, `images` for input and `output0` for output). Similarly, use the input dimensions noted above as `network_image_width` and `network_image_height`:
+- In another terminal inside the container, run the `isaac_ros_yolov5_tensor_rt` launch file. This launches the DNN image encoder node, TensorRT inference node and YOLOv5 decoder node. It also launches a visualization script that shows results on RQt. Use the names noted above in `Model preparation` as `input_binding_names` and `output_binding_names` (for example, `images` for `input_binding_names` and `output0` for `output_binding_names`). Similarly, use the input dimensions noted above as `network_image_width` and `network_image_height`:
 ```
 ros2 launch yolov5_isaac_ros isaac_ros_yolov5_tensor_rt.launch.py model_file_path:=/workspaces/isaac_ros-dev/src/yolov5s.onnx engine_file_path:=/workspaces/isaac_ros-dev/src/yolov5s.plan input_binding_names:=['images'] output_binding_names:=['output0'] network_image_width:=640 network_image_height:=640
 ```
-- For subsequent runs, use the following command as the engine file `yolov5s.plan` is saved after the first run:
+- For subsequent runs, use the following command as the engine file `yolov5s.plan` is generated and saved in `workspaces/isaac_ros-dev/src/` after running the command above:
 ```
-ros2 launch yolov5_isaac_ros isaac_ros_yolov5_tensor_rt.launch.py network_image_width:=640 network_image_height:=640 engine_file_path:=/workspaces/isaac_ros-dev/src/yolov5s.plan input_binding_names:=['images'] output_binding_names:=['output0']
+ros2 launch yolov5_isaac_ros isaac_ros_yolov5_tensor_rt.launch.py engine_file_path:=/workspaces/isaac_ros-dev/src/yolov5s.plan input_binding_names:=['images'] output_binding_names:=['output0'] network_image_width:=640 network_image_height:=640  
 ```
+- The workflow is shown in the image above:
+   - The DNN image encoder node subscribes to images from the RealSense camera node on topic `/camera/color/image_raw`.
+   - It encodes each image into an [isaac_ros_tensor_list_interfaces/TensorList](https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_common/blob/main/isaac_ros_tensor_list_interfaces/msg/TensorList.msg) message and publishes on topic `tensor_pub`.
+   - The TensorRT node uses the given ONNX model/TensorRT engine and performs inference on the tensors coming from the encoder node. It publishes results as a isaac_ros_tensor_list_interfaces/TensorList message on topic `tensor_sub`.
+   - The YOLOv5 decoder node does post-processing on these tensors to extract the following information for each detection in the image: (bounding box center X and Y coordinates, bounding box height and width, detection confidence score and object class). It publishes this information on topic `object_detections` as a [Detection2DArray](http://docs.ros.org/en/lunar/api/vision_msgs/html/msg/Detection2DArray.html) message. 
+   - `isaac_ros_yolov5_visualizer.py` subscribes to topics `camera/color/image_raw` from the camera node and `object_detections` from the decoder node. It publishes images with the resulting bounding boxes on topic `yolov5_processed_image`.
+   - On running the pipeline, an RQt window will pop up, where you can view `yolov5_processed_image`. These images will contain bounding boxes, object classes and detection scores around detected objects. You could also use Foxglove to view images on `yolov5_processed_image`.
+
 
 ## Using Triton
 
@@ -133,17 +141,10 @@ cd /usr/src/tensorrt/bin
 ros2 launch yolov5_isaac_ros isaac_ros_yolov5_triton.launch.py network_image_width:=640 network_image_height:=640
 ```
 
-### Output visualization
-The `yolov5_visualizer_node` subscribes to the topics below and publishes images with resulting bounding boxes on topic `yolov5_processed_image`:
-- `camera/color/image_raw`
-- `object_detections`
-
-On running the pipeline, an RQt window will pop up showing bounding boxes, object labels and detection scores around detected objects.
-
 ## Modifying detection parameters
 Parameters like the confidence threshold can be specified in the params file `decoder_params.yaml` under the `yolov5-isaac-ros-dnn/config` folder. Below is a description of each parameter:
-- conf_thres: Detection confidence threshold.
-- iou_thres: IOU threshold.
+- conf_thres: Detection confidence threshold
+- iou_thres: IOU threshold
 - max_det: Maximum number of detections per image
 
 ## Support
