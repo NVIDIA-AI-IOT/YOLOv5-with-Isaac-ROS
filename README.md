@@ -21,7 +21,7 @@ Refer to the license terms for the YOLOv5 project before using this software and
 
 ### Model preparation
 - Download the YOLOv5 PyTorch model - [yolov5s.pt](https://github.com/ultralytics/yolov5/releases/download/v6.2/yolov5s.pt) from the [Ultralytics YOLOv5](https://github.com/ultralytics/yolov5) project.
-- Export to ONNX following steps [here](https://github.com/ultralytics/yolov5/issues/251) and visualize the ONNX model using [Netron](https://netron.app/). Note `input` and `output` names - these will be used to run the node. For instance, `images` for input and `output0` for output. Also note input dimensions, for instance, (1x3x640x640).
+- Export to ONNX following steps [here](https://github.com/ultralytics/yolov5/issues/251) and visualize the ONNX model using [Netron](https://netron.app/). Note `input` and `output` names - these will be used to run the node. For instance, `images` for input and `output0` for output. Also note input dimensions, for instance, `(1x3x640x640)`.
 
 
 ### Object Detection pipeline Setup
@@ -46,7 +46,7 @@ cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common
 ```
 pip install -r src/requirements.txt
 ```
-This project runs on a device with an Nvidia GPU. The Isaac ROS Dev container uses the Nvidia-built PyTorch version with CUDA-acceleration. Ensure that you install a compatible Torchvision version from source for CUDA-acceleration. Specify the compatible version in place of `$torchvision_tag` below:
+*Install Torchvision*: This project runs on a device with an Nvidia GPU. The Isaac ROS Dev container uses the Nvidia-built PyTorch version with CUDA-acceleration. Ensure that you install a compatible Torchvision version from source for CUDA-acceleration. Specify the compatible version in place of `$torchvision_tag` below:
 ```
 git clone https://github.com/pytorch/vision.git
 cd vision
@@ -92,7 +92,7 @@ source install/setup.bash
 `ros2 launch realsense2_camera rs_launch.py`
 - Verify that images are being published on `/camera/color/image_raw`. You could use [RQt](https://docs.ros.org/en/humble/Concepts/About-RQt.html)/[Foxglove](https://foxglove.dev/) for this or use this command in another terminal inside the container:
 `ros2 topic echo /camera/color/image_raw`
-- In another terminal inside the container, run the `isaac_ros_yolov5_tensor_rt` launch file. This launches the DNN image encoder node, TensorRT inference node and YOLOv5 decoder node. It also launches a visualization script that shows results on RQt. Use the names noted above in `Model preparation` as `input_binding_names` and `output_binding_names` (for example, `images` for `input_binding_names` and `output0` for `output_binding_names`). Similarly, use the input dimensions noted above as `network_image_width` and `network_image_height`:
+- In another terminal inside the container, run the `isaac_ros_yolov5_tensor_rt` launch file. This launches the DNN image encoder node, TensorRT inference node and YOLOv5 decoder node. It also launches a visualization script that shows results on RQt. Use the names noted above in [Model preparation](https://github.com/NVIDIA-AI-IOT/YOLOv5-with-Isaac-ROS#model-preparation) as `input_binding_names` and `output_binding_names` (for example, `images` for `input_binding_names` and `output0` for `output_binding_names`). Similarly, use the input dimensions noted above as `network_image_width` and `network_image_height`:
 ```
 ros2 launch yolov5_isaac_ros isaac_ros_yolov5_tensor_rt.launch.py model_file_path:=/workspaces/isaac_ros-dev/src/yolov5s.onnx engine_file_path:=/workspaces/isaac_ros-dev/src/yolov5s.plan input_binding_names:=['images'] output_binding_names:=['output0'] network_image_width:=640 network_image_height:=640
 ```
