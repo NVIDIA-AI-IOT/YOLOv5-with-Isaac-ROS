@@ -46,7 +46,7 @@ cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common
 ```
 pip install -r src/requirements.txt
 ```
-*Install Torchvision*: This project runs on a device with an Nvidia GPU. The Isaac ROS Dev container uses the Nvidia-built PyTorch version with CUDA-acceleration. Ensure that you install a compatible Torchvision version from source for CUDA-acceleration. Specify the compatible version in place of `$torchvision_tag` below:
+**Install Torchvision**: This project runs on a device with an Nvidia GPU. The Isaac ROS Dev container uses the Nvidia-built PyTorch version with CUDA-acceleration. Ensure that you install a compatible Torchvision version from source for CUDA-acceleration. Specify the compatible version in place of `$torchvision_tag` below:
 ```
 git clone https://github.com/pytorch/vision.git
 cd vision
@@ -100,6 +100,7 @@ ros2 launch yolov5_isaac_ros isaac_ros_yolov5_tensor_rt.launch.py model_file_pat
 ```
 ros2 launch yolov5_isaac_ros isaac_ros_yolov5_tensor_rt.launch.py engine_file_path:=/workspaces/isaac_ros-dev/src/yolov5s.plan input_binding_names:=['images'] output_binding_names:=['output0'] network_image_width:=640 network_image_height:=640  
 ```
+- You can also [modify parameters](https://github.com/NVIDIA-AI-IOT/YOLOv5-with-Isaac-ROS#modifying-detection-parameters) to the YOLOv5 decoder node.
 - The workflow is shown in the image above:
    - The DNN image encoder node subscribes to images from the RealSense camera node on topic `/camera/color/image_raw`.
    - It encodes each image into an [isaac_ros_tensor_list_interfaces/TensorList](https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_common/blob/main/isaac_ros_tensor_list_interfaces/msg/TensorList.msg) message and publishes on topic `tensor_pub`.
