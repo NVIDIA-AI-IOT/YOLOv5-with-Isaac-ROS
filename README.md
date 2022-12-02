@@ -3,7 +3,7 @@
 This is a sample showing how to integrate YOLOv5 with Nvidia [Isaac ROS DNN Inference](https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_dnn_inference).
 
 <p align="center" width="100%">
-<img src="images/output.png"  height="75%" width="75%">
+<img src="images/output_gif.gif"  height="75%" width="75%">
 </p>
 
 ## Requirements
@@ -108,6 +108,10 @@ ros2 launch yolov5_isaac_ros isaac_ros_yolov5_tensor_rt.launch.py engine_file_pa
    - The YOLOv5 decoder node does post-processing on these tensors to extract the following information for each detection in the image: (bounding box center X and Y coordinates, bounding box height and width, detection confidence score and object class). It publishes this information on topic `object_detections` as a [Detection2DArray](http://docs.ros.org/en/lunar/api/vision_msgs/html/msg/Detection2DArray.html) message. 
    - `isaac_ros_yolov5_visualizer.py` subscribes to topics `camera/color/image_raw` from the camera node and `object_detections` from the decoder node. It publishes images with the resulting bounding boxes on topic `yolov5_processed_image`.
    - On running the pipeline, an RQt window will pop up, where you can view `yolov5_processed_image`. These images will contain bounding boxes, object classes and detection scores around detected objects. You could also use Foxglove to view images on `yolov5_processed_image`.
+   
+<p align="center" width="100%">
+<img src="images/output.png"  height="75%" width="75%">
+</p>   
 
 
 ### Using Triton inference node with TensorRT Backend
