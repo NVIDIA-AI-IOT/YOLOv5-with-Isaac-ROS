@@ -35,25 +35,25 @@ git clone https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_image_pipeline
 git clone https://github.com/NVIDIA-AI-IOT/YOLOv5-with-Isaac-ROS.git
 ```
 2. Download [requirements.txt](https://github.com/ultralytics/yolov5/blob/master/requirements.txt) from the Ultralytics YOLOv5 project to `workspaces/isaac_ros-dev/src`.
-- Copy your ONNX model (say, `yolov5s.onnx`) from above to `workspaces/isaac_ros-dev/src`.
-- Follow [Isaac ROS Realsense Setup](https://github.com/NVIDIA-ISAAC-ROS/.github/blob/main/profile/realsense-setup.md) to setup the camera.
-- Launch the Docker container using the run_dev.sh script:
+3. Copy your ONNX model (say, `yolov5s.onnx`) from above to `workspaces/isaac_ros-dev/src`.
+4. Follow [Isaac ROS Realsense Setup](https://github.com/NVIDIA-ISAAC-ROS/.github/blob/main/profile/realsense-setup.md) to setup the camera.
+5. Launch the Docker container using the run_dev.sh script:
 ```
 cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common
 ./scripts/run_dev.sh
 ```
-3. Inside the container, run the following: 
+6. Inside the container, run the following: 
 ```
 pip install -r src/requirements.txt
 ```
-4. **Install Torchvision**: This project runs on a device with an Nvidia GPU. The Isaac ROS Dev container uses the Nvidia-built PyTorch version with CUDA-acceleration. Ensure that you install a compatible Torchvision version from source for CUDA-acceleration. Specify the compatible version in place of `$torchvision_tag` below:
+7. **Install Torchvision**: This project runs on a device with an Nvidia GPU. The Isaac ROS Dev container uses the Nvidia-built PyTorch version with CUDA-acceleration. Ensure that you install a compatible Torchvision version from source for CUDA-acceleration. Specify the compatible version in place of `$torchvision_tag` below:
 ```
 git clone https://github.com/pytorch/vision.git
 cd vision
 git checkout $torchvision_tag
 pip install -v .
 ```
-5. Download the [utils](https://github.com/ultralytics/yolov5/tree/master/utils) folder from the Ultralytics YOLOv5 project and put it in the `yolov5_isaac_ros` folder of this repository.
+8. Download the [utils](https://github.com/ultralytics/yolov5/tree/master/utils) folder from the Ultralytics YOLOv5 project and put it in the `yolov5_isaac_ros` folder of this repository.
 Finally, your file structure should look like this (all files not shown here):
 ```
 .
@@ -74,7 +74,7 @@ Finally, your file structure should look like this (all files not shown here):
 ```
 Refer to the license terms for the YOLOv5 project before using this software and ensure you are using YOLOv5 under license terms compatible with your project requirements.
 
-6. Make the following changes to `utils/general.py`, `utils/torch_utils.py` and `utils/metrics.py` after downloading utils from the Ultralytics YOLOv5 project:
+9. Make the following changes to `utils/general.py`, `utils/torch_utils.py` and `utils/metrics.py` after downloading utils from the Ultralytics YOLOv5 project:
    1. In the import statements, add `yolov5_isaac_ros` before `utils`. For instance - change `from utils.metrics import box_iou` to `from yolov5_isaac_ros.utils.metrics import box_iou`
 
 <p align="center" width="100%">
